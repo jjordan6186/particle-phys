@@ -31,7 +31,7 @@ public class Particle {
 		g2D.setColor(new Color(red, green, blue));
 		g2D.fillOval((int) (pos.x-radius), (int) (pos.y-radius),(int) radius*2,(int) radius*2);
 		g2D.setColor(new Color(255,255,255));
-		g2D.setFont(new Font("Arial",Font.BOLD,20));
+		g2D.setFont(new Font("Arial",Font.BOLD,10));
 		FontMetrics fm = g2D.getFontMetrics();
 		g2D.drawString(text, (int) (pos.x-fm.stringWidth(text)/2.0), (int)(pos.y-fm.getHeight()/2.0+fm.getAscent()));
 		g2D.setColor(new Color(red, green, blue));

@@ -7,14 +7,14 @@ import javax.swing.*;
 
 public class MyPanel extends JPanel implements ActionListener, MouseListener {
 
-    final int PANEL_WIDTH = 800;
-    final int PANEL_HEIGHT = PANEL_WIDTH;
+    int PANEL_WIDTH = 1000;
+    int PANEL_HEIGHT = 800;
     final double G = 1; //because the gravitational constant in computer science is 1!!! XD
-    int intrad = 100; //either the radius of all of the particles or the max of random radii
+    int intrad = 20; //either the radius of all of the particles or the max of random radii
     boolean randrad = true; //use random radii???? very fun!
-    boolean setrad = true; //sets the radii to the array below!, no need to use amt.
-    int[] radii = {3,3,3,3,3,3,3,3,3,30};
-    int amt = 10; //amount of particles
+    boolean setrad = false; //sets the radii to the array below!, no need to use amt.
+    int[] radii = {50,50,50,50,50,50};
+    int amt = 100; //amount of particles
     int types = 10; //types of particles, used for color & emergent behavior
     int maxforce = 3; //emergent max force in forcetable
     int maxintvel = 0; //gives the particles a random velocity with a max of this variable
@@ -26,7 +26,7 @@ public class MyPanel extends JPanel implements ActionListener, MouseListener {
     boolean emergent = false;
     double dragE = 0.5;
     boolean gravity = !emergent;
-    double dragG = .9999;
+    double dragG = .99;
     //end of the types of johns
     double[][] forcetable; //array of forces to use in emergent behavior
     Particle[] parts;
@@ -41,7 +41,9 @@ public class MyPanel extends JPanel implements ActionListener, MouseListener {
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.setBackground(Color.BLACK);
         this.addMouseListener(this);
-        text = new JLabel("Total Kinetic Energy " + tke);
+
+        text = new JLabel("");
+        text.setFont(new Font("Arial", Font.PLAIN, 20));
         this.add(text);
         parts = new Particle[amt];
         for (int i = 0; i < amt; i++) {
@@ -77,11 +79,14 @@ public class MyPanel extends JPanel implements ActionListener, MouseListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        text.setText("Total Kinetic Energy " + df1.format(tke) + ", Particle Count: " + amt + ", Collisions: " + colc);
+        PANEL_HEIGHT = this.getHeight();
+        PANEL_WIDTH = this.getWidth();
+        text.setText("Total Kinetic Energy " + df1.format(tke) + ", Particle Count: " + amt + ", Collisions: " + colc + " Size: [" + this.getWidth() + "][" + this.getHeight() + "]");
+
         tke = 0;
         for (Particle p : parts) {
-            //p.updText("fart");
-            tke += p.vel.length();
+            //p.updText(""+ p.vel);
+            tke += p.vel.length()*p.radius;
             double rad = p.radius;
             if (edges) {
                 if (p.pos.x > PANEL_WIDTH - rad) {
@@ -137,15 +142,15 @@ public class MyPanel extends JPanel implements ActionListener, MouseListener {
                         Vector dist = other.pos.subtract(p.pos);
                         Vector norm = dist.normalize();
                         double l = dist.length();
-                        double F = other.radius / l;
+                        double F = other.radius / l/10.0;
                         p.acc = p.acc.add(norm.multiply(F));
                         if (coll && dist.length() <= rad + other.radius) {
                             Vector len1 = norm.multiply(p.vel.dotProd(norm));
                             Vector len2 = norm.multiply(other.vel.dotProd(norm));
                             p.vel = p.vel.subtract(len1);
                             other.vel = other.vel.subtract(len2);
-                            p.vel = p.vel.add(len2);
-                            other.vel = other.vel.add(len1);
+                            p.vel = p.vel.add(len2.multiply(other.radius/p.radius));
+                            other.vel = other.vel.add(len1.multiply(p.radius/other.radius));
                             Vector over = norm.multiply(dist.length() - (p.radius + other.radius));
                             double ratio = .5;
                             p.pos = p.pos.add(over.multiply(ratio));
